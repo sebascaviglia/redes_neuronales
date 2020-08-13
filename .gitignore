@@ -1,39 +1,43 @@
-# History files
-.Rhistory
-.Rapp.history
+---
+title: "R Notebook"
+output: html_notebook
+---
 
-# Session Data files
-.RData
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
 
-# User-specific files
-.Ruserdata
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
-# Example code in package build process
-*-Ex.R
+```{r}
+# redes neuronales
 
-# Output files from R CMD build
-/*.tar.gz
+#instalamos el pack
 
-# Output files from R CMD check
-/*.Rcheck/
 
-# RStudio files
-.Rproj.user/
+library("nnet")
+library(caret)
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
+#cargamos data ser
 
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
+bn <- read.csv("../Desktop/sebastian/r studio/cheat sheet/banknote-authentication.csv.txt")
 
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
+# convertimos class a factor
 
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
+bn$class <- factor(bn$class)
 
-# R Environment Variables
-.Renviron
+# creamos el conjunto de entrenamiento
+
+t.id <- createDataPartition(bn$class, p = 0.7 , list = FALSE)
+
+# creamos la red neuronal
+
+mod <- nnet(class ~ . , data = bn[t.id,],
+            size = 3 , maxit = 10000 , decay = .001, rang = 0.05)
+
+# creamos un predictor
+
+pred <- predict(mod, newdata = bn[-t.id,], type = "class" )
+
+#creamos una matriz de confusion para comprobar la eficiencia
+
+table(bn[-t.id,]$class ,pred , dnn= c("actual" , "predicho"))
+
